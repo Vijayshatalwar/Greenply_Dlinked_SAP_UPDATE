@@ -1,11 +1,11 @@
-﻿using GSPPL.common1;
+﻿using Greenply.common1;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GSPPL.GSPPL_Sample.Entity
+namespace Greenply.Greenply_Sample.Entity
 {
     public class LabelPrintingEntity : BaseEntity
     {
@@ -55,6 +55,7 @@ namespace GSPPL.GSPPL_Sample.Entity
         public DateTime? PostedOn { get; set; }
         public string SentBy { get; set; }
         public DateTime? SentOn { get; set; }
+        public string Server_Details { get; set; }
     }
     public class SuccessLogEntity
     {

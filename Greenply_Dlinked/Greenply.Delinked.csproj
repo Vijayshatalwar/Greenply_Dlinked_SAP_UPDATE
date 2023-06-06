@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GSPPL.common1\GSPPL.common1.csproj" />
+    <ProjectReference Include="..\Greenply.common1\Greenply.common1.csproj" />
   </ItemGroup>
 
 </Project>

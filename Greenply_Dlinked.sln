@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GSPPL.GSPPL_Sample", "GSPPL_Sample\GSPPL.GSPPL_Sample.csproj", "{85D889C1-0107-47A5-9586-D4FF07549DC8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Greenply.Delinked", "Greenply_Dlinked\Greenply.Delinked.csproj", "{85D889C1-0107-47A5-9586-D4FF07549DC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GSPPL.common1", "GSPPL.common1\GSPPL.common1.csproj", "{68E5CF16-BC5A-4E34-A55C-C978661A0422}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Greenply.common1", "Greenply.common1\Greenply.common1.csproj", "{68E5CF16-BC5A-4E34-A55C-C978661A0422}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

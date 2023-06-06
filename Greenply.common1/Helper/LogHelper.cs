@@ -1,6 +1,6 @@
 ﻿using log4net;
 
-namespace GSPPL.common1.Helper
+namespace Greenply.common1.Helper
 {
     public static class LogHelper
     {
@@ -11,12 +11,6 @@ namespace GSPPL.common1.Helper
             string batchID = DateTime.Now.ToString("dd-MMM-yyy hh-mm-ss tt");
             log4net.GlobalContext.Properties["LogName"] = batchID;
             log4net.Config.XmlConfigurator.Configure();
-
-            //if (!String.IsNullOrEmpty(ConfigurationManager.AppSettings["Log4Net-ConfigFile"]) && !String.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["Log4Net-ConfigFile"]))
-            //{
-            //    log4net.Config.XmlConfigurator.ConfigureAndWatch(new System.IO.FileInfo(ConfigurationManager.AppSettings["Log4Net-ConfigFile"].Trim())); 
-            //}
-
         }
 
         public static void LogError(Exception ex)

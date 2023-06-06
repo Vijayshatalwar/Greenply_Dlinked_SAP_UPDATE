@@ -1,4 +1,4 @@
-﻿namespace GSPPL.common1
+﻿namespace Greenply.common1
 {
     public class BaseEntity
     {
