@@ -48,7 +48,7 @@ namespace Greenply_Sample.Service
             return null;
         }
 
-        public string GetLatestRecordFetcheWithServer(Int64 PlantCode,string Server)
+        public string GetLatestRecordFetcheWithServer(Int64 PlantCode, string Server)
         {
             try
             {
@@ -75,7 +75,7 @@ namespace Greenply_Sample.Service
             return null;
         }
 
-        public void InsertPrintingDetails(LabelPrintingEntity entity,string Server)
+        public void InsertPrintingDetails(LabelPrintingEntity entity, string Server)
         {
             try
             {
@@ -113,9 +113,9 @@ namespace Greenply_Sample.Service
                     command.Parameters.Add("@VendorInvoice", SqlDbType.VarChar).Value = DBNull.Value;
 
                 if (entity.VendorInvoiceDate != null)
-                    command.Parameters.Add("@VendorInvoiceDate", SqlDbType.VarChar).Value = entity.VendorInvoiceDate;
+                    command.Parameters.Add("@VendorInvoiceDate", SqlDbType.DateTime).Value = entity.VendorInvoiceDate;
                 else
-                    command.Parameters.Add("@VendorInvoiceDate", SqlDbType.VarChar).Value = DBNull.Value;
+                    command.Parameters.Add("@VendorInvoiceDate", SqlDbType.DateTime).Value = DBNull.Value;
 
                 if (entity.VendorCode != null)
                     command.Parameters.Add("@VendorCode", SqlDbType.VarChar).Value = entity.VendorCode;
@@ -303,6 +303,9 @@ namespace Greenply_Sample.Service
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Error on Insert : -----------------");
+                Console.WriteLine(ex);
+                Console.ReadLine();
                 LogHelper.LogError(ex);
                 LogHelper.LogError("Failed to execute InsertPrintingDetails");
                 ErrorLogEntity newError = new ErrorLogEntity();
@@ -549,6 +552,7 @@ namespace Greenply_Sample.Service
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Connection Error");
                 LogHelper.LogError(ex);
                 LogHelper.LogError("Failed to execute GetPlantCodeK_PLY");
                 ErrorLogEntity newError = new ErrorLogEntity();
@@ -1060,6 +1064,168 @@ namespace Greenply_Sample.Service
             {
                 LogHelper.LogError(ex);
                 LogHelper.LogError("Failed to execute GetLatestRecordFetchedLasteHour_YHUB");
+                ErrorLogEntity newError = new ErrorLogEntity();
+                newError.Location_Code = Convert.ToInt32(0);
+                newError.TLocation_ID = Convert.ToInt32(0);
+                newError.ErrorDetails = "Function : GetLatestRecordFetchedLasteHour, Error : " + ex.Message;
+                newError.StartOn = DateTime.Now;
+                newError.EndOn = DateTime.Now;
+                INSERTErrorLog(newError);
+            }
+            return null;
+        }
+        #endregion
+
+        #region Phase 1 Chakda
+        public Int64 GetPlantCode_CHAKDAP1()
+        {
+            try
+            {
+                Console.WriteLine("Get Plant Code");
+                SqlCommand command = new SqlCommand("USP_GETPLANTCODE");
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+
+                Int64 data = Convert.ToInt64(_LabelPrintingRepository.CHAKDAP1ExecuteProcedure(command));
+
+                Console.WriteLine("Get Plant Code : " + data);
+                Console.ReadLine();
+
+                return data;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: - connection");
+                Console.ReadLine();
+                LogHelper.LogError(ex);
+                LogHelper.LogError("Failed to execute GetPlantCode_CHAKDAP1");
+                ErrorLogEntity newError = new ErrorLogEntity();
+                newError.Location_Code = Convert.ToInt32(0);
+                newError.TLocation_ID = Convert.ToInt32(0);
+                newError.ErrorDetails = "Function : USP_GETPLANTCODE, Error : " + ex.Message;
+                newError.StartOn = DateTime.Now;
+                newError.EndOn = DateTime.Now;
+                INSERTErrorLog(newError);
+            }
+            return 0;
+        }
+
+        public List<LabelPrintingEntity> PullRedordsById_CHAKDAP1(string LastExecutedId)
+        {
+            try
+            {
+                SqlCommand command = new SqlCommand("GetLatestRecordById");
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                command.Parameters.Add("@L_Id", SqlDbType.VarChar).Value = LastExecutedId;
+                return _LabelPrintingRepository.CHAKDAP1GetRecords(command).ToList();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogError(ex);
+                LogHelper.LogError("Failed to execute PullRedordsById_CHAKDAP1");
+                ErrorLogEntity newError = new ErrorLogEntity();
+                newError.Location_Code = Convert.ToInt32(0);
+                newError.TLocation_ID = Convert.ToInt32(0);
+                newError.ErrorDetails = "Function : GetLatestRecordById, Error : " + ex.Message;
+                newError.StartOn = DateTime.Now;
+                newError.EndOn = DateTime.Now;
+                INSERTErrorLog(newError);
+            }
+            return null;
+        }
+
+        public List<LabelPrintingEntity> GetLatestRecordFetchedLasteHour_CHAKDAP1()
+        {
+            try
+            {
+                SqlCommand command = new SqlCommand("GetLatestRecordFromLastHour");
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                return _LabelPrintingRepository.CHAKDAP1GetRecords(command).ToList();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogError(ex);
+                LogHelper.LogError("Failed to execute GetLatestRecordFetchedLasteHour_CHAKDAP1");
+                ErrorLogEntity newError = new ErrorLogEntity();
+                newError.Location_Code = Convert.ToInt32(0);
+                newError.TLocation_ID = Convert.ToInt32(0);
+                newError.ErrorDetails = "Function : GetLatestRecordFetchedLasteHour, Error : " + ex.Message;
+                newError.StartOn = DateTime.Now;
+                newError.EndOn = DateTime.Now;
+                INSERTErrorLog(newError);
+            }
+            return null;
+        }
+        #endregion
+
+        #region Phase 1 BAREILLY
+        public Int64 GetPlantCode_BAREILLY()
+        {
+            try
+            {
+                Console.WriteLine("Get Plant Code");
+                SqlCommand command = new SqlCommand("USP_GETPLANTCODE");
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+
+                Int64 data = Convert.ToInt64(_LabelPrintingRepository.BAREILLYExecuteProcedure(command));
+
+                Console.WriteLine("Get Plant Code : " + data);
+                Console.ReadLine();
+
+                return data;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: - connection");
+                Console.ReadLine();
+                LogHelper.LogError(ex);
+                LogHelper.LogError("Failed to execute GetPlantCode_BAREILLY");
+                ErrorLogEntity newError = new ErrorLogEntity();
+                newError.Location_Code = Convert.ToInt32(0);
+                newError.TLocation_ID = Convert.ToInt32(0);
+                newError.ErrorDetails = "Function : USP_GETPLANTCODE, Error : " + ex.Message;
+                newError.StartOn = DateTime.Now;
+                newError.EndOn = DateTime.Now;
+                INSERTErrorLog(newError);
+            }
+            return 0;
+        }
+
+        public List<LabelPrintingEntity> PullRedordsById_BAREILLY(string LastExecutedId)
+        {
+            try
+            {
+                SqlCommand command = new SqlCommand("GetLatestRecordById");
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                command.Parameters.Add("@L_Id", SqlDbType.VarChar).Value = LastExecutedId;
+                return _LabelPrintingRepository.BAREILLYGetRecords(command).ToList();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogError(ex);
+                LogHelper.LogError("Failed to execute PullRedordsById_BAREILLY");
+                ErrorLogEntity newError = new ErrorLogEntity();
+                newError.Location_Code = Convert.ToInt32(0);
+                newError.TLocation_ID = Convert.ToInt32(0);
+                newError.ErrorDetails = "Function : GetLatestRecordById, Error : " + ex.Message;
+                newError.StartOn = DateTime.Now;
+                newError.EndOn = DateTime.Now;
+                INSERTErrorLog(newError);
+            }
+            return null;
+        }
+
+        public List<LabelPrintingEntity> GetLatestRecordFetchedLasteHour_BAREILLY()
+        {
+            try
+            {
+                SqlCommand command = new SqlCommand("GetLatestRecordFromLastHour");
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                return _LabelPrintingRepository.BAREILLYGetRecords(command).ToList();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogError(ex);
+                LogHelper.LogError("Failed to execute GetLatestRecordFetchedLasteHour_BAREILLY");
                 ErrorLogEntity newError = new ErrorLogEntity();
                 newError.Location_Code = Convert.ToInt32(0);
                 newError.TLocation_ID = Convert.ToInt32(0);

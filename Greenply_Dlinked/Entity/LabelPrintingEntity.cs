@@ -19,7 +19,7 @@ namespace Greenply.Greenply_Sample.Entity
         public string MatStatus { get; set; }
         public string OldMatStatus { get; set; }
         public string VendorInvoice { get; set; }
-        public string VendorInvoiceDate { get; set; }
+        public DateTime VendorInvoiceDate { get; set; }
         public string VendorCode { get; set; }
         public string IsQRCodePrinted { get; set; }
         public string IsQRCodeUsed { get; set; }
