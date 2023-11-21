@@ -22,7 +22,8 @@ namespace Greenply.common1.Repository
         private SqlConnection _Pushconnection_BHUB;
         private SqlConnection _Pushconnection_YHUB;
         private SqlConnection _Pushconnection_CHAKDAP1;
-        private SqlConnection _Pushconnection_BAREILLY;
+        private SqlConnection _Pushconnection_BAREILLY; 
+        private SqlConnection _Pushconnection_CENTRAL; 
 
 
         /// <summary>
@@ -42,6 +43,7 @@ namespace Greenply.common1.Repository
             _Pushconnection_BHUB = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlDBConnectionPull_BHUB"].ConnectionString);//Sandila
             _Pushconnection_YHUB = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlDBConnectionPull_YHUB"].ConnectionString);//Sandila
             _Pushconnection_CHAKDAP1 = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlDBConnectionPull_CHAKDAP1"].ConnectionString);//Sandila
+            _Pushconnection_CENTRAL = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlDBConnectionPull_CENTRAL"].ConnectionString);//Sandila
         }
 
         /// <summary>
@@ -177,6 +179,34 @@ namespace Greenply.common1.Repository
 
             return returnObj;
         }
+
+        public IEnumerable<T> PUGetRecords(SqlCommand command)
+        {
+            var list = new List<T>();
+            command.Connection = _Pushconnection;
+            if (_Pushconnection.State == ConnectionState.Closed)
+                _Pushconnection.Open();
+            try
+            {
+                var reader = command.ExecuteReader();
+                try
+                {
+                    while (reader.Read())
+                        list.Add(PopulateRecord(reader));
+                }
+                finally
+                {
+                    // Always call Close when done reading.
+                    reader.Close();
+                }
+            }
+            finally
+            {
+                _Pushconnection.Close();
+            }
+            return list;
+        }
+
         #endregion
 
         #region Pull Kriparampur
@@ -479,6 +509,55 @@ namespace Greenply.common1.Repository
         }//in
         #endregion
 
+        #region Pull Central
+        public IEnumerable<T> CSGetRecords(SqlCommand command)
+        {
+            var list = new List<T>();
+            command.Connection = _Pushconnection_CENTRAL;
+            if (_Pushconnection_CENTRAL.State == ConnectionState.Closed)
+                _Pushconnection_CENTRAL.Open();
+            try
+            {
+                var reader = command.ExecuteReader();
+                try
+                {
+                    while (reader.Read())
+                        list.Add(PopulateRecord(reader));
+                }
+                finally
+                {
+                    // Always call Close when done reading.
+                    reader.Close();
+                }
+            }
+            finally
+            {
+                _Pushconnection_CENTRAL.Close();
+            }
+            return list;
+        }
+        public object CSExecuteProcedure(SqlCommand command)
+        {
+            object returnObj;
+            IDataReader reader = null;
+            DataTable table = new DataTable();
+            command.Connection = _Pushconnection_CENTRAL;
+            command.CommandType = CommandType.StoredProcedure;
+            //_Pushconnection_CENTRAL.Open();
+            if (_Pushconnection_CENTRAL.State == ConnectionState.Closed)
+                _Pushconnection_CENTRAL.Open();
+            try
+            {
+                returnObj = command.ExecuteScalar();
+            }
+            finally
+            {
+                _Pushconnection_CENTRAL.Close();
+            }
+
+            return returnObj;
+        }//in
+        #endregion
 
         #region Pull K Hub
         public IEnumerable<T> PKHUBGetRecords(SqlCommand command)

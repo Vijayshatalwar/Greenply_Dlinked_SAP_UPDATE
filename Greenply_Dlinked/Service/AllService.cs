@@ -1,16 +1,21 @@
 ﻿using Greenply.common1.Helper;
 using Greenply.common1.Repository;
+using Greenply.Dlinked_SAP_UPDATE.Service;
 using Greenply.Greenply_Sample.Entity;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Net;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace Greenply_Sample.Service
 {
+
     public class AllService
     {
-
         #region Feilds
         public DBContext<LabelPrintingEntity> _LabelPrintingRepository;
         #endregion
@@ -71,6 +76,29 @@ namespace Greenply_Sample.Service
                 newError.EndOn = DateTime.Now;
                 INSERTErrorLog(newError);
 
+            }
+            return null;
+        }
+        public List<LabelPrintingEntity> GetSAPFailedRecord()
+        {
+            try
+            {
+                SqlCommand command = new SqlCommand("GetAllFailedSAPRecords");
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                command.CommandTimeout = 600;
+                return _LabelPrintingRepository.PUGetRecords(command).ToList();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogError(ex);
+                LogHelper.LogError("Failed to execute GetSAPFailedRecord");
+                ErrorLogEntity newError = new ErrorLogEntity();
+                newError.Location_Code = Convert.ToInt32(0);
+                newError.TLocation_ID = Convert.ToInt32(0);
+                newError.ErrorDetails = "Function : GetSAPFailedRecord, Error : " + ex.Message;
+                newError.StartOn = DateTime.Now;
+                newError.EndOn = DateTime.Now;
+                INSERTErrorLog(newError);
             }
             return null;
         }
@@ -298,8 +326,10 @@ namespace Greenply_Sample.Service
                 else
                     command.Parameters.Add("@Server_Details", SqlDbType.NVarChar).Value = DBNull.Value;
 
+                Int64 Id = Convert.ToInt64(_LabelPrintingRepository.PExecuteProcedure(command));
 
-                _LabelPrintingRepository.PExecuteNonQueryProc(command);
+                FetchSAP_Status(Id, entity.LocationCode,entity.MatCode, entity.QRCode, entity.LocationCode + "_" + entity.ID);
+
             }
             catch (Exception ex)
             {
@@ -311,6 +341,35 @@ namespace Greenply_Sample.Service
                 ErrorLogEntity newError = new ErrorLogEntity();
                 newError.Location_Code = Convert.ToInt32(entity.LocationCode);
                 newError.TLocation_ID = Convert.ToInt32(entity.ID);
+                newError.ErrorDetails = ex.Message;
+                newError.StartOn = DateTime.Now;
+                newError.EndOn = DateTime.Now;
+                INSERTErrorLog(newError);
+            }
+        }
+
+        public void UpdatePrintingDetails(string SAP_Status,string SAP_Message, Int64 ID)
+        {
+            try
+            {
+                SqlCommand command = new SqlCommand("UPDATE_SAPStatus");
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+
+                command.Parameters.Add("@SAP_Status", SqlDbType.VarChar).Value = SAP_Status;//TLocation_ID
+                command.Parameters.Add("@ID", SqlDbType.BigInt).Value = ID;//TLocation_ID
+                command.Parameters.Add("@SAP_Message", SqlDbType.VarChar).Value = SAP_Message;//TLocation_ID
+
+                _LabelPrintingRepository.PExecuteNonQueryProc(command);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error on Update : -----------------");
+                Console.WriteLine(ex);
+                //Console.ReadLine();
+                LogHelper.LogError(ex);
+                LogHelper.LogError("Failed to execute Update SAP Status");
+                ErrorLogEntity newError = new ErrorLogEntity();
+                newError.TLocation_ID = Convert.ToInt32(ID);
                 newError.ErrorDetails = ex.Message;
                 newError.StartOn = DateTime.Now;
                 newError.EndOn = DateTime.Now;
@@ -760,6 +819,79 @@ namespace Greenply_Sample.Service
         }
         #endregion
 
+        #region Kriparampur Central
+        public List<LabelPrintingEntity> GetPlantCode_Central()
+        {
+            try
+            {
+                SqlCommand command = new SqlCommand("USP_GETPLANTCODE");
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                return _LabelPrintingRepository.CSGetRecords(command).ToList();
+                //return Convert.ToInt64(_LabelPrintingRepository.CSExecuteProcedure(command));
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogError(ex);
+                LogHelper.LogError("Failed to execute GetPlantCode_Central");
+                ErrorLogEntity newError = new ErrorLogEntity();
+                newError.Location_Code = Convert.ToInt32(0);
+                newError.TLocation_ID = Convert.ToInt32(0);
+                newError.ErrorDetails = "Function : USP_GETPLANTCODE, Error : " + ex.Message;
+                newError.StartOn = DateTime.Now;
+                newError.EndOn = DateTime.Now;
+                INSERTErrorLog(newError);
+            }
+            return null;
+        }
+
+        public List<LabelPrintingEntity> PullRedordsById_Central(string LastExecutedId,Int64 LocationCode)
+        {
+            try
+            {
+                SqlCommand command = new SqlCommand("GetLatestRecordById");
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                command.Parameters.Add("@L_Id", SqlDbType.VarChar).Value = LastExecutedId;
+                command.Parameters.Add("@LocationCode", SqlDbType.BigInt).Value = LocationCode;
+                return _LabelPrintingRepository.CSGetRecords(command).ToList();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogError(ex);
+                LogHelper.LogError("Failed to execute PullRedordsById_Central");
+                ErrorLogEntity newError = new ErrorLogEntity();
+                newError.Location_Code = Convert.ToInt32(0);
+                newError.TLocation_ID = Convert.ToInt32(0);
+                newError.ErrorDetails = "Function : GetLatestRecordById, Error : " + ex.Message;
+                newError.StartOn = DateTime.Now;
+                newError.EndOn = DateTime.Now;
+                INSERTErrorLog(newError);
+            }
+            return null;
+        }
+
+        public List<LabelPrintingEntity> GetLatestRecordFetchedLasteHour_Central()
+        {
+            try
+            {
+                SqlCommand command = new SqlCommand("GetLatestRecordFromLastHour");
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                return _LabelPrintingRepository.CSGetRecords(command).ToList();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogError(ex);
+                LogHelper.LogError("Failed to execute GetLatestRecordFetchedLasteHour_Central");
+                ErrorLogEntity newError = new ErrorLogEntity();
+                newError.Location_Code = Convert.ToInt32(0);
+                newError.TLocation_ID = Convert.ToInt32(0);
+                newError.ErrorDetails = "Function : GetLatestRecordFetchedLasteHour, Error : " + ex.Message;
+                newError.StartOn = DateTime.Now;
+                newError.EndOn = DateTime.Now;
+                INSERTErrorLog(newError);
+            }
+            return null;
+        }
+        #endregion
 
         #endregion
 
@@ -1237,5 +1369,59 @@ namespace Greenply_Sample.Service
             return null;
         }
         #endregion
+
+        public void FetchSAP_Status(Int64 Id, string LocationCode, string matcode, string qrcode, string UnqId)
+        {
+            try
+            {
+                string url = "http://greenplyapp.com:8000/gilapis/qrcodepost2sap?sap-client=100";
+                HttpWebRequest httpRequest = (HttpWebRequest)WebRequest.Create(url);
+                httpRequest.Method = "POST";
+                string authorization = "QRCODE" + ":" + "Green@2018";
+                string base64 = Convert.ToBase64String(Encoding.Default.GetBytes(authorization));
+                httpRequest.Headers.Add("Authorization", "Basic " + base64);
+
+                using (var streamWriter = new StreamWriter(httpRequest.GetRequestStream()))
+                {
+                    string json = "{\"locationcode\" : \"" + LocationCode + "\",\"matcode\" : \"" + matcode + "\",\"qrcode\"  : \"" + qrcode + "\", \"uniquesrid\": \"" + UnqId + "\"}";
+                    streamWriter.Write(json);
+                }
+
+                var httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+                    var result = streamReader.ReadToEnd();
+                    if (result != null)
+                    {
+                        ResponseEntity obj = JsonConvert.DeserializeObject<ResponseEntity>(result);
+                        if (!string.IsNullOrWhiteSpace(obj.status))
+                            UpdatePrintingDetails(obj.status, obj.message, Id);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error on FetchSAP_Status : -----------------");
+                Console.WriteLine(ex);
+                //Console.ReadLine();
+                LogHelper.LogError(ex);
+                LogHelper.LogError("Failed to FetchSAP_Status");
+                ErrorLogEntity newError = new ErrorLogEntity();
+                newError.Location_Code = Convert.ToInt32(LocationCode);
+                newError.TLocation_ID = Convert.ToInt32(Id);
+                newError.ErrorDetails = ex.Message;
+                newError.StartOn = DateTime.Now;
+                newError.EndOn = DateTime.Now;
+                INSERTErrorLog(newError);
+            }
+        }
+        public class ResponseEntity
+        {
+            public string locationcode { get; set; }
+            public string matcode { get; set; }
+            public string qrcode { get; set; }
+            public string status { get; set; }
+            public string message { get; set; }
+        }
     }
 }
